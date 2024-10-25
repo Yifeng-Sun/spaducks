@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base href="." />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spa Ducks</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: rgb(74, 66, 54);
+            /* Changed background color */
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            /* Monospace font for pixel art */
+            overflow: hidden;
+            position: relative;
+        }
+
+        .duck {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.3s;
+            animation: float 8s infinite ease-in-out;
+            will-change: transform;
+            user-select: none;
+            color: rgb(158, 235, 220);
+            font-size: 10px;
+            line-height: 8px;
+            transform-origin: center center;
+            /* Center scaling point */
+        }
+
+
+        .clicked {
+            transform: scale(0.9) translateZ(0);
+            /* Scale down with translateZ to prevent position shifts */
+        }
+
+        .duck:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            /* Add background */
+            border: 2px solid rgba(158, 235, 220, 0.8);
+            /* Add border */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            /* Add shadow */
+            color: rgba(255, 255, 255, 1);
+            /* Change color to white */
+
+            animation-play-state: paused; /* Pauses the floating animation */
+        }
+
+        #progress-tracker {
+            color: rgb(158, 235, 220);
+            /* Default color */
+        }
+
+        #progress-tracker .current-note {
+            color: rgb(255, 85, 85);
+            /* Different color for the current note */
+            font-weight: bold;
+        }
+
+        #duck1 {
+            left: 20%;
+            top: 30%;
+            animation-duration: 7s;
+        }
+
+        #duck2 {
+            left: 60%;
+            top: 50%;
+            animation-duration: 9s;
+        }
+
+        #duck3 {
+            left: 40%;
+            top: 70%;
+            animation-duration: 8s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate3d(0, 0, 0) rotate(2deg);
+            }
+
+            25% {
+                transform: translate3d(30px, -15px, 0) rotate(-2deg);
+            }
+
+            50% {
+                transform: translate3d(0, 0, 0) rotate(2deg);
+            }
+
+            75% {
+                transform: translate3d(-30px, -15px, 0) rotate(-2deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+
+        .sequence-hint {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .duck {
+                font-size: 10px;
+            }
+        }
+
+        .pixel-trace {
+            position: absolute;
+            color: rgb(158, 235, 220);
+            /* Duck color */
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            opacity: 0.8;
+            user-select: none;
+            animation: fadeOut 1s forwards;
+        }
+
+        .sequence-tracker {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: rgb(158, 235, 220);
+            font-family: 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #cowContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            /* Allow interactions below the rain */
+            overflow: hidden;
+        }
+
+        .raindrop {
+            position: absolute;
+            top: 0;
+            font-size: 16px;
+            color: rgba(158, 235, 220, 0.8);
+            /* Color similar to the ducks */
+            animation: fall linear;
+            pointer-events: none;
+            font-weight: bold;
+            /* Make raindrops bold */
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+                /* Fall down to the bottom of the screen */
+            }
+        }
+
+
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+            }
+        }
+
+        pre {
+            font-size: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sequence-tracker">
+        <pre id="progress-tracker"></pre> <!-- Preformatted for pixel art effect -->
+    </div>
+
+    <div class="duck" id="duck1" data-note="1">
+        <pre>
+    ░░░░░░░░░░             
+    ░▒░░░░░░░░░░░░           
+   ▒▒▒░░░░░░░░░░░░░          
+  ░▒▒▒▒░▒▒░░░░░░░░░░         
+  ░▒▒▒▒▒███░░░░░░░░░         
+  ░▓▓▒▒▒▒▒▒░░░░░░▒░░░░░░░    
+ ░▓▓▓▓▓▒▒░▒░▒░▒▒▒▒▒░░░░░░░   
+    ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░  
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░ 
+   ▒▒▒▒▒▒▒▒▒▒▒▒░░░░░▒░░░░░░░ 
+   ▒▒▒▒▒▒▒░▒░░░░░░░░▒░░░░░░░ 
+   ▒▒▒▒▒░░░░░░░░░░░░▒░░░░░░  
+    ▒▒▒▒▒▒▒░░░░░░░░░░▒▒▒░░   
+    ░▒▒▒▒▒▒▒▒░▒░░░░░▒▒▒░░    
+     ░░░▒▒▒▒▒▒▒▒▒▒▒░░░░ 
+        </pre>
+    </div>
+
+    <!-- Duplicate the above <div> for duck2 and duck3, updating id and data-note accordingly -->
+    <div class="duck" id="duck2" data-note="2">
+        <!-- Same pixel art -->
+        <pre>
+    ░░░░░░░░░░             
+    ░▒░░░░░░░░░░░░           
+   ▒▒▒░░░░░░░░░░░░░          
+  ░▒▒▒▒░▒▒░░░░░░░░░░         
+  ░▒▒▒▒▒███░░░░░░░░░         
+  ░▓▓▒▒▒▒▒▒░░░░░░▒░░░░░░░    
+ ░▓▓▓▓▓▒▒░▒░▒░▒▒▒▒▒░░░░░░░   
+    ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░  
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░ 
+   ▒▒▒▒▒▒▒▒▒▒▒▒░░░░░▒░░░░░░░ 
+   ▒▒▒▒▒▒▒░▒░░░░░░░░▒░░░░░░░ 
+   ▒▒▒▒▒░░░░░░░░░░░░▒░░░░░░  
+    ▒▒▒▒▒▒▒░░░░░░░░░░▒▒▒░░   
+    ░▒▒▒▒▒▒▒▒░▒░░░░░▒▒▒░░    
+     ░░░▒▒▒▒▒▒▒▒▒▒▒░░░░ 
+        </pre>
+    </div>
+    <div class="duck" id="duck3" data-note="3">
+        <!-- Same pixel art -->
+        <pre>
+    ░░░░░░░░░░             
+    ░▒░░░░░░░░░░░░           
+   ▒▒▒░░░░░░░░░░░░░          
+  ░▒▒▒▒░▒▒░░░░░░░░░░         
+  ░▒▒▒▒▒███░░░░░░░░░         
+  ░▓▓▒▒▒▒▒▒░░░░░░▒░░░░░░░    
+ ░▓▓▓▓▓▒▒░▒░▒░▒▒▒▒▒░░░░░░░   
+    ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░  
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░ 
+   ▒▒▒▒▒▒▒▒▒▒▒▒░░░░░▒░░░░░░░ 
+   ▒▒▒▒▒▒▒░▒░░░░░░░░▒░░░░░░░ 
+   ▒▒▒▒▒░░░░░░░░░░░░▒░░░░░░  
+    ▒▒▒▒▒▒▒░░░░░░░░░░▒▒▒░░   
+    ░▒▒▒▒▒▒▒▒░▒░░░░░▒▒▒░░    
+     ░░░▒▒▒▒▒▒▒▒▒▒▒░░░░ 
+        </pre>
+    </div>
+
+
+    <div id="cowContainer"></div> <!-- Container for rain -->
+
+    <script>
+        // JavaScript code remains largely the same
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let currentSequence = [];
+        let correctSequence = [1, 2, 3];
+        let duckCount = 3;
+        const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+        function startRain() {
+            const raindrops = '.oO'; // Characters for raindrop
+            const cowContainer = document.getElementById('cowContainer'); // Make sure to grab the container
+
+            function createRaindrop() {
+                const raindrop = document.createElement('div');
+                raindrop.className = 'raindrop';
+                raindrop.style.left = `${Math.random() * 100}%`;
+                raindrop.style.animationDuration = `${Math.random() * 1 + 0.5}s`; // Random speed
+                raindrop.textContent = raindrops[Math.floor(Math.random() * raindrops.length)];
+                cowContainer.appendChild(raindrop);
+
+                // Remove raindrop after animation completes
+                raindrop.addEventListener('animationend', () => {
+                    cowContainer.removeChild(raindrop);
+                });
+            }
+
+            // Start creating raindrops at intervals
+            window.rainInterval = setInterval(createRaindrop, 3);
+        }
+
+        function createQuack(frequency) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const filterNode = audioContext.createBiquadFilter();
+
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+
+            filterNode.type = 'lowpass';
+            filterNode.frequency.setValueAtTime(1000, audioContext.currentTime);
+
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.8, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+            oscillator.connect(filterNode);
+            filterNode.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        function createNewDuck() {
+            duckCount++;
+            const newDuck = document.querySelector('.duck').cloneNode(true);
+
+            newDuck.id = 'duck' + duckCount;
+            newDuck.dataset.note = duckCount;
+
+            // Random position and overlap checking
+            // Random position and distance checking
+            let overlapping = true;
+            const minDistance = 300; // Minimum distance in pixels
+
+            while (overlapping) {
+                // Set random position for the new duck
+                newDuck.style.left = Math.random() * 60 + 20 + '%';
+                newDuck.style.top = Math.random() * 60 + 20 + '%';
+
+                // Get the bounding rectangle of the new duck
+                const newDuckRect = newDuck.getBoundingClientRect();
+                const newDuckCenterX = newDuckRect.left + newDuckRect.width / 2;
+                const newDuckCenterY = newDuckRect.top + newDuckRect.height / 2;
+
+                // Check if the new duck is at least `minDistance` away from all other ducks
+                overlapping = Array.from(document.querySelectorAll('.duck')).some(existingDuck => {
+                    const existingRect = existingDuck.getBoundingClientRect();
+                    const existingCenterX = existingRect.left + existingRect.width / 2;
+                    const existingCenterY = existingRect.top + existingRect.height / 2;
+
+                    // Calculate the distance between the centers of the ducks
+                    const distanceX = newDuckCenterX - existingCenterX;
+                    const distanceY = newDuckCenterY - existingCenterY;
+                    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+                    // Return true if the distance is less than the minimum distance
+                    return distance < minDistance;
+                });
+            }
+
+
+            newDuck.style.animationDuration = `${7 + Math.random() * 3}s`;
+
+            document.body.appendChild(newDuck);
+            setupDuckListeners(newDuck);
+            return newDuck;
+        }
+        function changeDuckAsciiArt() {
+    const newAsciiArt1 = `
+    ░░░░░░░░░░
+    ░▒░░░░░░░░ 
+   ▒▒▒░░░░░░░░  seems like you are on the phone
+  ░▒▒▒▒░▒▒░░░░
+  ░▒▒▒▒▒███░░░░░░░░░         
+  ░▓▓▒▒▒▒▒▒░░░░░░▒░░░░░░░    
+ ░▓▓▓▓▓▒▒░▒░▒░▒▒▒▒▒░░░░░░░   
+    ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░  
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░ 
+   ▒▒▒▒▒▒▒▒▒▒▒▒░░░░░▒░░░░░░░ 
+   ▒▒▒▒▒▒▒░▒░░░░░░░░▒░░░░░░░ 
+   ▒▒▒▒▒░░░░░░░░░░░░▒░░░░░░  
+    ▒▒▒▒▒▒▒░░░░░░░░░░▒▒▒░░   
+    ░▒▒▒▒▒▒▒▒░▒░░░░░▒▒▒░░    
+     ░░░▒▒▒▒▒▒▒▒▒▒▒░░░░ 
+    `;  // First example of new ASCII art
+
+    const newAsciiArt2 = `
+    ░░░░░░░░░░ 
+    ░▒░░░░░░░░
+   ▒▒▒░░░░░░░░  use a desktop for the real game!
+  ░▒▒▒▒░▒▒░░░░
+  ░▒▒▒▒▒███░░░░░░░░░         
+  ░▓▓▒▒▒▒▒▒░░░░░░▒░░░░░░░    
+ ░▓▓▓▓▓▒▒░▒░▒░▒▒▒▒▒░░░░░░░   
+    ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░  
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░ 
+   ▒▒▒▒▒▒▒▒▒▒▒▒░░░░░▒░░░░░░░ 
+   ▒▒▒▒▒▒▒░▒░░░░░░░░▒░░░░░░░ 
+   ▒▒▒▒▒░░░░░░░░░░░░▒░░░░░░  
+    ▒▒▒▒▒▒▒░░░░░░░░░░▒▒▒░░   
+    ░▒▒▒▒▒▒▒▒░▒░░░░░▒▒▒░░    
+     ░░░▒▒▒▒▒▒▒▒▒▒▒░░░░ 
+    `;  // Second example of new ASCII art
+
+    // Get all ducks and alternate the ASCII art for the first two
+    const duckElements = document.querySelectorAll('.duck pre');
+    
+    // Change the first duck to the first ASCII art
+    if (duckElements[0]) {
+        duckElements[0].textContent = newAsciiArt1;
+    }
+    
+    // Change the second duck to the second ASCII art
+    if (duckElements[1]) {
+        setTimeout(() => {
+            duckElements[1].textContent = newAsciiArt2;
+        }, 1000); // 1000 ms = 1 second delay
+    }
+    
+}
+
+        function checkSequence() {
+            if (currentSequence.length === correctSequence.length) {
+                if (JSON.stringify(currentSequence) === JSON.stringify(correctSequence)) {
+                    updateProgressTracker(); // Call to update progress
+                    qualifiedLength = isMobile ? 4 : 8;
+                    if (duckCount < qualifiedLength) {
+                        setTimeout(() => {
+                            const newDuck = createNewDuck();
+                            correctSequence.push(duckCount);
+
+                            const celebrationNote = 600 + (duckCount * 50);
+                            createQuack(celebrationNote);
+
+                            newDuck.style.transform = 'scale(1.2)';
+                            setTimeout(() => {
+                                newDuck.style.transform = '';
+                            }, 500);
+                        }, 500);
+                    } else {
+                        // Sequence complete, start the rain effect
+                        startRain();
+
+                        if (isMobile) {
+                    // On mobile, change the ASCII art after completion
+                    changeDuckAsciiArt();
+                } else {
+                    // Apply spinning effect to all ducks (desktop only)
+                    document.querySelectorAll('.duck').forEach(duck => {
+                        duck.style.transition = 'transform 4s ease-out';  // Add smooth transition
+                        duck.style.animation = 'spin 4s infinite linear';  // Add spin animation
+                    });
+
+                    setTimeout(() => {
+                        // Ask for confirmation before redirecting on desktop
+                        if (window.confirm('The sequence is complete! Would you like to see a cow?')) {
+                            window.location.href = 'https://yifengsun.dora.run';
+                        } else {
+                            console.log('User canceled the redirection.');
+                        }
+                    }, 4000);  // Delay to allow the spinning animation to play out
+                } // Delay to allow the spinning animation to play out
+                    }
+                }
+                currentSequence = [];
+                updateProgressTracker(); // Update tracker for reset
+            }
+        }
+
+        function updateProgressTracker() {
+            const progressTracker = document.getElementById('progress-tracker');
+            let progressDisplay = '';
+
+            for (let i = 0; i < correctSequence.length; i++) {
+                if (i < currentSequence.length - 1) {
+                    progressDisplay += '■ ';
+                } else if (i === currentSequence.length - 1) {
+                    progressDisplay += '<span class="current-note">▲</span> ';
+                } else {
+                    progressDisplay += '□ ';
+                }
+            }
+
+            progressTracker.innerHTML = progressDisplay; // Use innerHTML to insert span
+        }
+
+        function setupDuckListeners(duck) {
+            // Handle clicks (or touch) on the duck
+            function handleClick(e) {
+                e.preventDefault();
+
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+
+                const note = parseInt(duck.dataset.note);
+                const baseFrequency = 300;
+                const frequency = baseFrequency + (note - 1) * 50;
+                createQuack(frequency);
+
+                // Add scaling class
+                duck.classList.add('clicked');
+                setTimeout(() => {
+                    duck.classList.remove('clicked');
+                }, 200);
+
+                currentSequence.push(note);
+                updateProgressTracker(); // Update the tracker to show the current note
+                checkSequence();
+            }
+
+
+            duck.addEventListener('mousedown', handleClick);
+            duck.addEventListener('touchstart', handleClick, { passive: false });
+
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+            let traceCounter = 0; // Counter to track how often traces are created
+            // Start dragging
+            function dragStart(e) {
+                e.preventDefault();
+                isDragging = true;
+
+                // Record the start position of the mouse/touch
+                startX = e.clientX || e.touches[0].clientX;
+                startY = e.clientY || e.touches[0].clientY;
+
+                // Get the initial position of the duck
+                const rect = duck.getBoundingClientRect();
+                initialLeft = rect.left;
+                initialTop = rect.top;
+            }
+
+            // Move the duck
+            function drag(e) {
+                if (isDragging) {
+                    e.preventDefault();
+
+                    const currentX = e.clientX || e.touches[0].clientX;
+                    const currentY = e.clientY || e.touches[0].clientY;
+
+                    const deltaX = currentX - startX;
+                    const deltaY = currentY - startY;
+
+                    duck.style.left = `${initialLeft + deltaX}px`;
+                    duck.style.top = `${initialTop + deltaY}px`;
+
+                    // Increment the counter and only create a trace every 5 drag events
+                    traceCounter++;
+                    if (traceCounter % 5 === 0 && !isMobile) {
+                        const trace = document.createElement('div');
+                        trace.className = 'pixel-trace';
+                        trace.style.left = `${currentX - 2}px`;
+                        trace.style.top = `${currentY - 2}px`;
+                        trace.textContent = Math.random() > 0.5 ? 'spa' : 'duck';
+                        document.body.appendChild(trace);
+                        setTimeout(() => trace.remove(), 1000);
+                    }
+                }
+            }
+
+            // Stop dragging
+            function dragEnd() {
+                isDragging = false;
+            }
+
+            // Add event listeners for both mouse and touch
+            duck.addEventListener('mousedown', dragStart);
+            duck.addEventListener('touchstart', dragStart, { passive: false });
+
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag, { passive: false });
+
+            document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchend', dragEnd);
+        }
+
+
+
+
+        document.querySelectorAll('.duck').forEach(duck => {
+            setupDuckListeners(duck);
+        });
+    </script>
+</body>
+
+</html>
